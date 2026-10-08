@@ -1,136 +1,83 @@
-# InTainFT_POC
+# SpendWise
 
+SpendWise is a personal spending dashboard. It turns imported or manually entered transactions into category, monthly, payment-method and city insights, with editable categories and monthly budgets. Sample transactions are fictional; the app does not connect to a bank or process payments.
 
-Intain PoC Challenge: Personal Spending
-Intelligence Platform
-Problem Statement
-You're tasked with building a Personal Spending Intelligence Dashboard that
-aggregates payment data from multiple sources and provides users with intelligent
-insights about their spending patterns, merchant preferences, and financial behavior. Core Requirements
-1. Data Integration Layer  Integrate with 2 different data sources:
+This is an independent portfolio project. The supported stack is React 18 + Vite + Redux Toolkit/RTK Query + GraphQL on the frontend and FastAPI + Strawberry + SQLAlchemy + Alembic on the backend. Production storage is Neon Postgres; local development defaults to SQLite so no cloud credentials are needed to run it.
 
-o Razorpay Payment APIs (sandbox mode) - for transaction and payment
-data
-o Google Places API - for merchant categorization and location intelligence
-o Data Flow: Use Razorpay transaction data → Enrich with Google Places
-merchant details → Generate spending insights
+## Try It Locally
 
-2. Backend Architecture
- Build a REST API that handles:
-o User authentication and authorization
-o Secure storage of financial transaction data
-o Real-time data synchronization from payment APIs
-o Merchant data enrichment and categorization
-o Spending pattern analysis and aggregation
+Requires Node.js 20+, Python 3.12+, and npm. From the `SpendWise` directory, use two terminals:
 
-3. Frontend Dashboard
- Create a React-based dashboard showing:
-o Transaction history with smart categorization
-o Spending breakdown by categories (food, transport, entertainment, etc.)
-o Geographic spending patterns (location-wise analysis)
-o Payment method preferences (UPI vs Card vs Net Banking)
-o Spending trends and anomaly detection
-o Budget recommendations and alerts
+```powershell
+cd backend
+py -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
+.\.venv\Scripts\alembic.exe upgrade head
+.\.venv\Scripts\python.exe -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+```
 
-4. Security & Compliance
- Implement OAuth 2.0 for user authentication
- Secure API key management for payment data
- Data encryption for sensitive financial information
- Audit logging for all financial transactions
- PCI-DSS consideration for payment data handling
+```powershell
+cd frontend
+npm ci
+npm run dev
+```
 
-Technical Constraints
- Tech Stack: React.js, Node.js/Express.js, MongoDB (match your existing skills)  APIs: Use sandbox/demo modes only (no real financial data)  Deployment: Local development environment is sufficient  Time Limit: Complete over the weekend (48-72 hours)
-Specific Challenges to Address
-1. Data Reliability & Reconciliation Challenge
- Payment APIs may return incomplete merchant information
- Google Places API might not find exact matches for merchant names
- Handle API rate limits and failures gracefully for both services
- Implement fuzzy matching for merchant name normalization
- Validate transaction amounts and detect anomalies
-2. Intelligent Categorization Challenge
- Automatically categorize diverse Indian merchants (kirana stores, medical shops, petrol bunks)  Handle ambiguous business types (cafes that are also co-working spaces)  Create meaningful spending categories relevant to Indian context  Deal with inconsistent merchant naming conventions
-3. User Experience & Trust Challenge
- Users are extremely sensitive about financial data privacy
- Design trust-building UI elements for spending data
- Handle slow API responses during merchant lookup
- Provide meaningful insights without overwhelming users
- Build confidence in automated categorization accuracy
-4. Performance & Scalability Challenge
- Real-time merchant enrichment can be slow
- Implement caching strategies for frequently accessed merchant data
- Optimize API calls to Google Places (costs money)  Design for handling large transaction volumes
- Manage API quotas effectively
-5. Business Logic Challenge
- Create meaningful spending insights from raw transaction data
- Detect unusual spending patterns and potential fraud
- Generate personalized budget recommendations
- Handle different payment methods and their implications
- Provide location-based spending intelligence
+Open [http://127.0.0.1:5173/](http://127.0.0.1:5173/). The app opens at sign-in. For email sign-in, copy `backend/.env.example` to `backend/.env`, set a Resend API key and verified `EMAIL_FROM`, and keep a stable `JWT_SECRET`; the API sends a six-digit OTP. Without Resend, email verification is unavailable; Google sign-in can still be used when configured. An unknown email submitted at sign-in is sent to account creation instead of being auto-created. If an existing password uses an unsupported legacy format, email OTP lets its owner set a new password without accepting the old hash. After OTP verification, new accounts receive view-only access until an admin assigns a role. Use fictional data while testing; do not enter real bank statements or payment credentials.
 
-Detailed Feature Requirements
-Core Features (Must Have)
-1. Transaction Import: Fetch and store transaction data from Razorpay sandbox
-2. Merchant Enrichment: Use Google Places to get business categories and locations
-3. Smart Categorization: Automatically categorize transactions (Food, Transport, Shopping, etc.)
-4. Spending Dashboard: Visual breakdown of spending by category, time, location
-5. Search & Filter: Find transactions by merchant, category, amount, date range
-Advanced Features (Should Have)
-1. Geographic Analysis: Pin code/area wise spending patterns
-2. Payment Method Insights: UPI vs Card vs Net Banking usage patterns
-3. Spending Trends: Weekly/monthly spending pattern analysis
-4. Budget Tracking: Set and monitor spending budgets by category
-5. Anomaly Detection: Flag unusual spending patterns
-Bonus Features (Nice to Have)
-1. Recurring Payment Detection: Identify subscription and recurring payments
-2. Merchant Recommendations: Suggest nearby merchants based on spending
-history
-3. Export Functionality: Generate spending reports (PDF/Excel)
-4. Mobile Responsive: PWA-ready spending dashboard
-Sample API Integration Flow
-// 1. Fetch transactions from Razorpay
-const transactions = await razorpay.payments.all({
-from: '2024-07-01',
-to: '2024-07-17',
-count: 100
-});
-// 2. Enrich with Google Places data
-for (let transaction of transactions) {
-const placeDetails = await googlePlaces.findPlace({
-input: transaction.description,
-inputtype: 'textquery',
-fields: 'place_id,name,types,geometry,price_level'
-});
-// 3. Categorize and store
-const category = categorizeTransaction(placeDetails.types);
-await saveEnrichedTransaction({
-...transaction,
-merchant_details: placeDetails,
-category: category,
-location: placeDetails.geometry
-});
+The default bootstrap owner is `roytanmoy.main@gmail.com`. It only receives superadmin after that address completes email OTP verification. To enable Google, configure the Google OAuth client ID/secret and register the exact callback URL `http://127.0.0.1:8000/auth/google/callback` in Google Cloud. Provider credentials are not included; without them, Google sign-in returns a friendly configuration message.
 
-}
-Bonus Points
- Real-time Features: WebSocket implementation for live transaction updates
- Machine Learning: Advanced categorization using ML algorithms
- Indian Context: Handle regional languages in merchant names
- Testing: Unit tests for categorization logic and financial calculations
- DevOps: Docker containerization with proper environment management  Privacy: Data anonymization techniques for sensitive financial data
-Available Resources (Suggested)
- Razorpay Sandbox: Free sandbox environment with comprehensive documentation
- Google Places API: Free tier (SKU: Basic Data, Text Search, Place Details)  Sample Data: Create realistic Indian merchant transaction data
- No restriction on using AI tools for learning APIs, but core logic should
-demonstrate your thinking
+On macOS/Linux, use `python3 -m venv .venv`, `.venv/bin/python`, and `.venv/bin/alembic` in the first terminal.
 
-## PCI-DSS Compliance Notes
-- No card data is stored in the database or logs.
-- Payment method details are masked in API responses.
-- Sensitive fields (email, payment_id) are anonymized before returning to frontend.
-- All API keys are managed via environment variables and never exposed to the client.
-- Audit logging is enabled for all financial transactions.
+## What Works
 
-## Privacy/Anonymization
-- User emails and payment IDs are masked in API responses.
-- Anonymization utility is implemented in backend for sensitive fields.
-- Data encryption is used for sensitive financial information.
+- Register/sign in with server-side Argon2 hashing, email OTP, short-lived access cookies and rotating HttpOnly refresh sessions; Google OIDC is enabled by provider configuration.
+- Keep separate, email-scoped personas/workspaces; verified new accounts are read-only until an admin assigns `viewer`, `editor`, or `admin`. The configured superadmin can invite/remove users and assign administrative roles.
+- Maintain profiles, view-only pending access, and in-app plus email notifications when verified users request access.
+- Add transactions, search and filter merchants, correct categories, delete entries, and page through results.
+- Import an atomic CSV batch (up to 200 rows/128 KiB) and export up to 5,000 transactions to formula-safe CSV.
+- Inspect monthly trends, category and payment-method breakdowns, leading cities, recent activity and monthly category budgets.
+- Navigate by keyboard and mobile menu; chart, route and data-loading states are explicit.
+
+Amounts are stored as integer paise and formatted as INR only at the UI boundary. Categorization uses transparent merchant-name rules, not a trained model. There is **no** Razorpay/Google Places integration, live synchronization, fraud verdict or PCI certification in this version. The product does not store card numbers or payment credentials.
+
+## Structure
+
+```text
+frontend/src/app/             Routes and Redux store
+frontend/src/features/        Dashboard, transactions, budgets, auth, profile, admin
+frontend/src/shared/          GraphQL transport, display helpers, UI states
+backend/app/api/              GraphQL schema and request resolvers
+backend/app/domain/           Pure categorization, summaries and CSV rules
+backend/app/                  Configuration, session security, ORM and app factory
+backend/migrations/           Versioned Postgres-compatible schema
+backend/tests/                Hermetic domain, API, security and migration checks
+```
+
+The feature-first frontend matches the layout used by the portfolio project without coupling this React app to that project's Next.js server. See [architecture](docs/ARCHITECTURE.md) and [GraphQL API](docs/API.md).
+
+## Neon Deployment
+
+Set the backend environment variables in [backend/.env.example](backend/.env.example), including Neon TLS Postgres, a long random `JWT_SECRET`, `DEMO_MODE=false`, `SECURE_COOKIES=true`, HTTPS `FRONTEND_ORIGIN`, Resend credentials, and Google OAuth credentials/callback if Google login is enabled. Run `alembic upgrade head` before deployment. The root [vercel.json](vercel.json) routes the Vite frontend and FastAPI backend under one Vercel domain. See [deployment](docs/DEPLOYMENT.md) and [security](docs/SECURITY.md).
+
+Neon connectivity and production deployment cannot be verified without your database URL and hosting configuration; local tests use isolated SQLite databases. Do not paste credentials into this repository or any frontend environment variable.
+
+## Verification
+
+```powershell
+cd backend
+.\.venv\Scripts\ruff.exe check app migrations tests
+.\.venv\Scripts\ruff.exe format --check app migrations tests
+.\.venv\Scripts\python.exe -m pytest -q tests --cov=app --cov-fail-under=80
+
+cd ../frontend
+npm run lint
+npm test -- --reporter=dot
+npm run build
+npm audit --omit=dev --audit-level=high
+```
+
+CI runs these checks for pushes and pull requests. The backend test suite uses no real provider or database credentials. A patched Vitest major release currently needs Node 22.12+, so two moderate **development-only** audit findings remain on the locally compatible Vitest 3 toolchain; the runtime dependency audit has no high-severity findings.
+
+## Release Notes
+
+- 1.0: Independent SpendWise rebuild with a FastAPI GraphQL/Neon-ready backend, React/Redux UI, synthetic demo, CSV workflows, budgets, migration and automated checks.

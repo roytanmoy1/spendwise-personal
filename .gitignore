@@ -21,6 +21,7 @@ Thumbs.db
 .vscode/
 .idea/
 *.swp
+.vercel/
 
 # Coverage
 coverage/
@@ -30,17 +31,20 @@ coverage/
 *.sublime-workspace
 *.sublime-project
 
-# React
-frontend/build/
-
-# MongoDB
-*.lock
+frontend/dist/
+frontend/coverage/
 
 # Backend
 backend/.env
-backend/node_modules/
-backend/logs/
+backend/.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.coverage
+*.db
 
 # Frontend
 frontend/node_modules/
 frontend/.env
+.vercel
+.env*
