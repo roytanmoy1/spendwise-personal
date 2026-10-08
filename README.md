@@ -57,7 +57,7 @@ The feature-first frontend matches the layout used by the portfolio project with
 
 ## Neon Deployment
 
-Set the backend environment variables in [backend/.env.example](backend/.env.example), including Neon TLS Postgres, a long random `JWT_SECRET`, `DEMO_MODE=false`, `SECURE_COOKIES=true`, HTTPS `FRONTEND_ORIGIN`, Resend credentials, and Google OAuth credentials/callback if Google login is enabled. Run `alembic upgrade head` before deployment. The root [vercel.json](vercel.json) routes the Vite frontend and FastAPI backend under one Vercel domain. See [deployment](docs/DEPLOYMENT.md) and [security](docs/SECURITY.md).
+Set the backend environment variables in [backend/.env.example](backend/.env.example), including Neon TLS Postgres, a long random `JWT_SECRET`, `DEMO_MODE=false`, `SECURE_COOKIES=true`, HTTPS `FRONTEND_ORIGIN`, Resend credentials, and Google OAuth credentials/callback if Google login is enabled. The Vercel backend build applies Alembic migrations using Neon’s unpooled URL. The root [vercel.json](vercel.json) routes the Vite frontend and FastAPI backend under one Vercel domain. See [deployment](docs/DEPLOYMENT.md) and [security](docs/SECURITY.md).
 
 Neon connectivity and production deployment cannot be verified without your database URL and hosting configuration; local tests use isolated SQLite databases. Do not paste credentials into this repository or any frontend environment variable.
 

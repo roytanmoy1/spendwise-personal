@@ -38,7 +38,8 @@
     "backend": {
       "root": "backend/",
       "framework": "fastapi",
-      "entrypoint": "app.main:app"
+      "entrypoint": "app.main:app",
+      "buildCommand": "python -m alembic upgrade head"
     }
   },
   "rewrites": [

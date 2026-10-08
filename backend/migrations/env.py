@@ -1,3 +1,5 @@
+import os
+
 from alembic import context
 
 from app import models
@@ -7,8 +9,13 @@ from app.db import make_engine
 target_metadata = models.Base.metadata
 
 
+def _migration_engine():
+    database_url = os.environ.get("DATABASE_URL_UNPOOLED") or Settings().database_url
+    return make_engine(database_url)
+
+
 def run_migrations_offline():
-    engine = make_engine(Settings().database_url)
+    engine = _migration_engine()
     context.configure(
         url=engine.url.render_as_string(hide_password=False),
         target_metadata=target_metadata,
@@ -20,7 +27,7 @@ def run_migrations_offline():
 
 
 def run_migrations_online():
-    engine = make_engine(Settings().database_url)
+    engine = _migration_engine()
     with engine.connect() as connection:
         context.configure(
             connection=connection, target_metadata=target_metadata, compare_type=True
