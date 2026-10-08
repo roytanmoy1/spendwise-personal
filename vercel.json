@@ -3,7 +3,37 @@
   "services": {
     "frontend": {
       "root": "frontend/",
-      "framework": "vite"
+      "framework": "vite",
+      "rewrites": [
+        {
+          "source": "/login",
+          "destination": "/index.html"
+        },
+        {
+          "source": "/register",
+          "destination": "/index.html"
+        },
+        {
+          "source": "/verify-email",
+          "destination": "/index.html"
+        },
+        {
+          "source": "/transactions",
+          "destination": "/index.html"
+        },
+        {
+          "source": "/budgets",
+          "destination": "/index.html"
+        },
+        {
+          "source": "/profile",
+          "destination": "/index.html"
+        },
+        {
+          "source": "/admin",
+          "destination": "/index.html"
+        }
+      ]
     },
     "backend": {
       "root": "backend/",
